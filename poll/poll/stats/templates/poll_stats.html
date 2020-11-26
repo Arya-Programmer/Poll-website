@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load filters %}
+
+{% block title %}
+<link rel="stylesheet" href="{% static 'stats/css/style.css' %}">
+<title>Poll {{object.poll_id}} | Stats</title>
+{% endblock %}
+
+{% block main %}
+    <div class="border rounded margin-border">
+        <h4>
+            {{ questions.title }}
+            <span style="float: right">participants: {{users_number}}</span>
+        </h4>
+            {% for question in questions.questions.all %}
+                <div class="questions">
+                    <h6 style="font-weight: 600;">
+                        {{  question.title  }}
+                    </h6>
+                    {% for answer in question.answers.all %}
+                            {% if stats|inside:question.title|islist == False %}
+                                {% define stats|inside:question.title|inside:answer.title|percentage:users_number as percentage %}
+                                <span class="stats">
+                                    {{ answer.title }}
+                                </span>
+                                <div class="progress stats">
+                                  <div class="progress-bar" role="progressbar" style="width: {{percentage}}%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                                      {{percentage}}%</div>
+                                </div>
+                            {% elif stats|inside:question.title|islist %}
+                                {% for listItem in stats|inside:question.title %}
+                                    <hr>
+                                    <p>{{ listItem }}</p>
+                                    {% if forloop.last %}
+                                        <hr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+    </div>
+{% endblock %}
+
